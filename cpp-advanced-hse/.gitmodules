@@ -1,0 +1,6 @@
+[submodule "cpp-advanced-hse-grader"]
+	path = grader
+	url = ../cpp-advanced-hse-grader.git
+[submodule "private"]
+	path = private
+	url = ../cpp-advanced-hse-private.git

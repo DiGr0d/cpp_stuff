@@ -1,0 +1,61 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - test
+  - release
+
+.check:
+  stage: test
+  image: cr.yandex/crppmgcujiph4hvf0dup/hse-cxx-build:latest
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_TITLE !~ /.*SKIP_CHECK.*/
+  script:
+    - cmake --version
+    - python3 --version
+    - ./infra/patch-from-private.py
+    - mkdir -p build/solutions
+    - cd build/solutions
+    - cmake ../../ -G Ninja -DTEST_SOLUTION=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - ninja test-all
+
+check-solutions-gcc-13-debug:
+  extends: .check
+  variables:
+    CC: gcc-13
+    CXX: g++-13
+    BUILD_TYPE: Debug
+
+check-solutions-clang-18-debug:
+  extends: .check
+  variables:
+    CC: clang-18
+    CXX: clang++-18
+    BUILD_TYPE: Debug
+
+check-solutions-clang-18-asan:
+  extends: .check
+  variables:
+    CC: clang-18
+    CXX: clang++-18
+    BUILD_TYPE: ASAN
+
+check-solutions-clang-18-tsan:
+  extends: .check
+  variables:
+    CC: clang-18
+    CXX: clang++-18
+    BUILD_TYPE: TSAN
+
+deploy:
+  only:
+  - main
+  tags:
+  - docker
+  stage: release
+  script:
+  - docker pull cr.yandex/crppmgcujiph4hvf0dup/hse-cxx-build:latest
+  - git checkout .
+  - docker build -f infra/testenv.docker -t cr.yandex/crppmgcujiph4hvf0dup/hse-cxx-testenv .
+  - docker push cr.yandex/crppmgcujiph4hvf0dup/hse-cxx-testenv:latest

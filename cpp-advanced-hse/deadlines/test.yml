@@ -1,0 +1,60 @@
+# Add new groups at the bottom
+
+scoring:
+  policies:
+  - name: hard
+    kind: linear
+    spec:
+      after: 1h
+      multiplier: 0
+  - name: notsohard
+    kind: exp
+    spec:
+      multiplier: 120h
+      threshold: 0.3
+
+  groups:
+  - name: weekly
+    weight: 4.0
+    policy: notsohard
+
+  - name: large
+    weight: 6.0
+    policy: hard
+    maxScore: 3000
+
+  - name: bonus
+    weight: 1.0
+    policy: hard
+    maxScore: 1000
+
+  defaultGroup: weekly
+  finalDeadline: 31-12-2025 23:59
+  retakePenalty: 0.6
+
+
+assignments:
+- title:    00-setup
+  start:    09-09-2025 15:00
+  deadline: 21-09-2025 23:59
+  tasks:
+  - task: intro/multiplication
+    score: 100
+  - task: intro/gcd
+    score: 100
+    crashme: true
+
+- title:    01-memory
+  start:    13-09-2025 00:00
+  deadline: 27-09-2025 23:59
+  tasks:
+  - task: memory/dedup
+    score: 100
+  - task: memory/string-view
+    score: 100
+  - task: memory/lru-cache
+    score: 100
+  - task: memory/intrusive-list
+    score: 100
+  - task: memory/deque
+    score: 300
